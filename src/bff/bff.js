@@ -1,20 +1,13 @@
-// генерация новой даты для регистрации нового пользователя
-const generateDate = () => {
-	new Date(Math.random() * 1000000000000 + 1999999999999)
-		.toISOString()
-		.substring(0, 16)
-		.replace('T', ' ');
-};
-
+import { addUser } from './add-user.js';
+import { getUser } from './get-user.js';
+import { createSession } from './session.js';
+// запросы на сервер
 export const server = {
 	// авторизация пользователя
 	async authorize(authLogin, authPassword) {
-		// запрос на сервер для получения списка пользователей
-		const users = await fetch('http://localhost:3005/users').then((loadedUsers) =>
-			loadedUsers.json(),
-		);
-		// получение пользователя по логину
-		const user = users.find(({ login }) => login === authLogin);
+		// запрос на сервер для получения списка пользователя
+		const user = await getUser(authLogin);
+
 		//проверка вывода пользователя
 		if (!user) {
 			return {
@@ -29,32 +22,20 @@ export const server = {
 				res: null,
 			};
 		}
-		// сессия для пользователя
-		const sessison = {
-			logout() {
-				Object.keys(sessison).forEach((key) => delete sessison[key]);
-			},
-			removeComment() {
-				console.log('Удаления комментария');
-			},
-		};
+
 		// добавление в сессию информации о пользователе
 		return {
 			error: null,
-			res: sessison,
+			res: createSession(user.role_id),
 		};
 	},
 	// регистрация пользователя
 	async register(regLogin, regPassword) {
 		// запрос на сервер для получения списка пользователей
-		const users = await fetch('http://localhost:3005/users').then((loadedUsers) =>
-			loadedUsers.json(),
-		);
-		// получение пользователя по логину
-		const user = users.find(({ login }) => login === regLogin);
+		const user = await getUser(regLogin);
 
 		//проверка вывода пользователя
-		if (user) {
+		if (!user) {
 			return {
 				error: 'Такой логин уже зарегистрирован',
 				res: null,
@@ -62,18 +43,7 @@ export const server = {
 		}
 
 		// добавление нового пользователя
-		await fetch('http://localhost:3005/users', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json;charset=utf-8',
-				body: JSON.stringify({
-					login: regLogin,
-					password: regPassword,
-					registed_at: generateDate(),
-					role_id: 2,
-				}),
-			},
-		});
+		await addUser(regLogin, regPassword);
 
 		// сессия для пользователя
 		const sessison = {
@@ -87,7 +57,7 @@ export const server = {
 
 		return {
 			error: null,
-			res: sessison,
+			res: createSession(user.role_id),
 		};
 	},
 };
