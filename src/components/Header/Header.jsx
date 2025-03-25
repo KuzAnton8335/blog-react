@@ -1,15 +1,28 @@
 import styled from 'styled-components';
-import Logo from './components';
+import { ControlPanel } from './components/control-panel/controlPanel';
+import { Logo } from './components/logo/Logo';
+
+const Descroption = styled.div`
+	font-style: italic;
+`;
 
 const Header = ({ className }) => {
 	return (
 		<header className={className}>
 			<Logo />
+			<Descroption>
+				Веб-технологии
+				<br /> Написание кода
+				<br /> Разбор ошибок
+			</Descroption>
+			<ControlPanel />
 		</header>
 	);
 };
 
 const StyledHeader = styled(Header)`
+	display: flex;
+	justify-content: space-between;
 	position: fixed;
 	top: 0;
 	width: 920px;
