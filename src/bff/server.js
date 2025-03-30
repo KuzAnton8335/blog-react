@@ -1,6 +1,6 @@
 import { addUser } from './add-user.js';
+import { createSession } from './create-session.js';
 import { getUser } from './get-user.js';
-import { createSession } from './session.js';
 // запросы на сервер
 export const server = {
 	// авторизация пользователя

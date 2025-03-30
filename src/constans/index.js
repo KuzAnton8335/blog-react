@@ -1,1 +1,2 @@
-export * from './role';
+import ROLE from './role';
+export default ROLE;

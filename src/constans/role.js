@@ -1,5 +1,7 @@
-export const ROLE = {
+const ROLE = {
 	ADMIN: 0,
 	MODERATOR: 1,
 	READER: 2,
 };
+
+export default ROLE;
