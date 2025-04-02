@@ -1,16 +1,20 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import * as yup from 'yup';
 import { server } from '../../bff';
+import { Button } from '../../components/Button/Button';
+import { Input } from '../../components/Input/Input';
+import H2 from '../../components/h2/H2';
 
 //схема авторизации при помощи yup
 const authFormSchema = yup.object().shape({
 	login: yup
 		.string()
 		.required('Заполните поле логина')
-		.matches(/^w+$/, 'Неверный логин. Допускаются только буквы и цифры')
+		.matches(/^\w+$/, 'Неверный логин. Допускаются только буквы и цифры')
 		.min(3, 'Неверный логин. Минимум 3 символа')
 		.max(15, 'Неверный логин. Максимум 15 символов'),
 
@@ -18,29 +22,42 @@ const authFormSchema = yup.object().shape({
 		.string()
 		.required('Заполните поле пароля')
 		.matches(
-			/[\^w#%]+$/,
+			/^[\w#%]+$/,
 			'Неверный пароль. Допускаются только буквы, цифры, и знаки # %',
 		)
 		.min(6, 'Неверно заполнено  поля пароля, пароль должен быть не менее 6 символов')
 		.max(30, 'Неверно заполнено  поля пароля,  Максимум 30 символов'),
 });
 
+const StyledLink = styled(Link)`
+	font-size: 18px;
+	text-aligen: center;
+	text-decoration: underline;
+	margin: 20px 0;
+`;
+
+const ErrorMessage = styled.div`
+	margin: 10px 0 0;
+	padding: 10px;
+	font-size: 18px;
+	background-color: #f88a89;
+`;
+
 // условия авторизации при помощи useForm и yupResolver
 const AuthorizationContainer = ({ className }) => {
 	const {
 		register,
 		handleSubmit,
-		formState: { error },
+		formState: { errors }, // Исправлено
 	} = useForm({
 		defaultValues: {
 			login: '',
 			password: '',
 		},
-
 		resolver: yupResolver(authFormSchema),
 	});
 	//  переменная для вывода ошибок сервера
-	const [serverError, setServerError] = useState();
+	const [serverError, setServerError] = useState(null);
 	// обработка ошибки сервера на форме авторизации
 	const onSubmit = ({ login, password }) => {
 		server.authorize(login, password).then(({ error, res }) => {
@@ -52,27 +69,31 @@ const AuthorizationContainer = ({ className }) => {
 		});
 	};
 	// ошибки формы авторизации
-	const formError = error?.login?.message || error?.password?.message;
+	const formError = errors?.login?.message || errors?.password?.message; // Исправлено
 	// ошибки сервера при авторизации
 	const errorMessage = formError || serverError;
 
 	return (
 		<div className={className}>
-			<h2>Регистрация</h2>
+			<H2>Регистрация</H2>
 			<form onSubmit={handleSubmit(onSubmit)}>
-				<input type="text" placeholder="Логин..." {...register('login')} />
-				<input
+				<Input
+					type="text"
+					placeholder="Логин..."
+					{...register('login', {
+						onChange: () => setServerError(null),
+					})}
+				/>
+				<Input
 					type="password"
 					placeholder="Пароль..."
-					{...register('password')}
+					{...register('password', {
+						onChange: () => setServerError(null),
+					})}
 				/>
-				<input
-					type="password"
-					placeholder="Повтор пароля..."
-					{...register('password')}
-				/>
-				<button type="submit">Зарегистрироваться</button>
-				{errorMessage && <div>{errorMessage}</div>}
+				<Button type="submit">Авторизоватся</Button>
+				{errorMessage && <ErrorMessage>{errorMessage}</ErrorMessage>}
+				<StyledLink to="/register">Регистрация</StyledLink>
 			</form>
 		</div>
 	);
@@ -89,6 +110,7 @@ const Authorization = styled(AuthorizationContainer)`
 		flex-direction: column;
 		align-items: center;
 		gap: 10px;
+		width: 260px;
 	}
 `;
 
