@@ -1,9 +1,11 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import * as yup from 'yup';
+import { setUser } from '../../actions';
 import { server } from '../../bff';
 import { Button } from '../../components/Button/Button';
 import { Input } from '../../components/Input/Input';
@@ -45,10 +47,13 @@ const ErrorMessage = styled.div`
 
 // условия авторизации при помощи useForm и yupResolver
 const AuthorizationContainer = ({ className }) => {
+	// функция dispatch
+	const dispatch = useDispatch();
+	// переменные для работы формы авторизации
 	const {
 		register,
 		handleSubmit,
-		formState: { errors }, // Исправлено
+		formState: { errors },
 	} = useForm({
 		defaultValues: {
 			login: '',
@@ -63,9 +68,9 @@ const AuthorizationContainer = ({ className }) => {
 		server.authorize(login, password).then(({ error, res }) => {
 			if (error) {
 				setServerError(`Ошибка запроса:${error}`);
-			} else {
-				console.log(res);
+				return;
 			}
+			dispatch(setUser(res));
 		});
 	};
 	// ошибки формы авторизации

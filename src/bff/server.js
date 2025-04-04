@@ -1,6 +1,6 @@
 import { addUser } from './add-user.js';
-import { createSession } from './create-session.js';
 import { getUser } from './get-user.js';
+import { sessions } from './sessions.js';
 // запросы на сервер
 export const server = {
 	// авторизация пользователя
@@ -26,7 +26,12 @@ export const server = {
 		// добавление в сессию информации о пользователе
 		return {
 			error: null,
-			res: createSession(user.role_id),
+			res: {
+				id: user.id,
+				login: user.login,
+				roleId: user.role_id,
+				session: sessions.create(),
+			},
 		};
 	},
 	// регистрация пользователя
@@ -57,7 +62,12 @@ export const server = {
 
 		return {
 			error: null,
-			res: createSession(user.role_id),
+			res: {
+				id: user.id,
+				login: user.login,
+				roleId: user.role_id,
+				session: sessions.create(user),
+			},
 		};
 	},
 };
