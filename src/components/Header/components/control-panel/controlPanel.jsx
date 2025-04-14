@@ -1,5 +1,13 @@
+import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
+import { logout } from '../../../../actions';
+import ROLE from '../../../../constans';
+import {
+	selectUserLogin,
+	selectUserRole,
+	selectUserSession,
+} from '../../../../selectors';
 import { Button } from '../../../Button/Button';
 import { Icon } from '../icon/Icon';
 
@@ -14,11 +22,26 @@ const StyledIcon = styled.div`
 
 const ControlPanelContainer = ({ className }) => {
 	const navigate = useNavigate();
+	const dispatch = useDispatch();
+	const roleId = useSelector(selectUserRole);
+	const login = useSelector(selectUserLogin);
+	const session = useSelector(selectUserSession);
+
 	return (
 		<div className={className}>
+			{/* изменение кнопки при авторизации  */}
 			<RightAlign>
 				<Button>
-					<Link to="/login">Войти</Link>
+					{roleId === ROLE.GUEST ? (
+						<Link to="/login">Войти</Link>
+					) : (
+						<>
+							<div>{login}</div>
+							<StyledIcon onClick={() => dispatch(logout(session))}>
+								<Icon id="fa-sign-out" margin="10px 0 0 0" />
+							</StyledIcon>
+						</>
+					)}
 				</Button>
 			</RightAlign>
 			<RightAlign>

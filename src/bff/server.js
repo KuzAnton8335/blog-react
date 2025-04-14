@@ -3,6 +3,10 @@ import { getUser } from './get-user.js';
 import { sessions } from './sessions.js';
 // запросы на сервер
 export const server = {
+	// удаления сессии пользователя
+	async logout(session) {
+		sessions.remove(session);
+	},
 	// авторизация пользователя
 	async authorize(authLogin, authPassword) {
 		// запрос на сервер для получения списка пользователя
