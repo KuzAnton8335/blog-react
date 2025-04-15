@@ -1,5 +1,5 @@
 import { ACTION_TYPE } from '../actions/action-type';
-import ROLE from '../constans/role';
+import ROLE from '../constants/role';
 
 // начальное состояние
 const initialUserState = {

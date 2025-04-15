@@ -1,4 +1,4 @@
-import { default as removeComment, default as ROLE } from '../constans';
+import { default as removeComment, default as ROLE } from '../constants';
 // новая сессия для пользователя с правами roleId
 export const createSession = (roleId) => {
 	const session = {
