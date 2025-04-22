@@ -1,5 +1,5 @@
 // начальное состояние
-import { ACTION_TYPE } from '../actions/index.js';
+import { ACTION_TYPE } from '../actions';
 
 const initialAppState = {
 	wasLogout: false,

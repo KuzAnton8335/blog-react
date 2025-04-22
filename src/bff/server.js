@@ -44,7 +44,7 @@ export const server = {
 		const user = await getUser(regLogin);
 
 		//проверка вывода пользователя
-		if (!user) {
+		if (user) {
 			return {
 				error: 'Такой логин уже зарегистрирован',
 				res: null,
@@ -53,6 +53,13 @@ export const server = {
 
 		// добавление нового пользователя
 		await addUser(regLogin, regPassword);
+
+		if (!user) {
+			return {
+				error:'Ошибка при регистрации',
+				res: null,
+			}
+		}
 
 		// сессия для пользователя
 		const sessison = {

@@ -1,14 +1,18 @@
 import { server } from '../bff';
-import * as ACTION_TYPE from './action-type';
+import { ACTION_TYPE } from './action-type.js';
+
 
 export const logout = (session) => async (dispatch) => {
 	try {
-		await server.logout(session); // Wait for the logout to complete
+		await server.logout(session);
 		dispatch({
 			type: ACTION_TYPE.LOGOUT,
 		});
 	} catch (error) {
 		console.error("Logout failed:", error);
-		// Optionally, dispatch an error action here
+		dispatch({
+			type: ACTION_TYPE.LOGOUT_ERROR,
+			error: error.message,
+		})
 	}
 };

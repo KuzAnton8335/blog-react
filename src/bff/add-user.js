@@ -2,7 +2,7 @@ import { generateDate } from './generate-date.js';
 // добавление пользователя
 export const addUser = async (login, password) => {
 	// добавление нового пользователя в базу данных
-	fetch('http://localhost:3005/users', {
+	const response = fetch('http://localhost:3005/users', {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json;charset=utf-8',
@@ -14,4 +14,6 @@ export const addUser = async (login, password) => {
 			}),
 		},
 	});
+	if (!response.ok) throw new Error('Ошибка при добавлении пользователя')
+	return response.json();
 };

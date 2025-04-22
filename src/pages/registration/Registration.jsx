@@ -16,7 +16,7 @@ import {
 } from '../../selectors';
 
 //схема авторизации при помощи yup
-const authFormSchema = yup.object().shape({
+const registerFormSchema = yup.object().shape({
 	login: yup
 		.string()
 		.required('Заполните поле логина')
@@ -33,14 +33,12 @@ const authFormSchema = yup.object().shape({
 		)
 		.min(6, 'Неверно заполнено  поля пароля, пароль должен быть не менее 6 символов')
 		.max(30, 'Неверно заполнено  поля пароля,  Максимум 30 символов'),
+	passcheck: yup
+		.string()
+		.required('Заполните повторно поле пароля')
+		.oneOf([yup.ref('password'), null], 'Пароли не совпадают'),
 });
 
-const StyledLink = styled(Link)`
-	font-size: 18px;
-	text-aligen: center;
-	text-decoration: underline;
-	margin: 20px 0;
-`;
 
 const ErrorMessage = styled.div`
 	margin: 10px 0 0;
@@ -50,15 +48,15 @@ const ErrorMessage = styled.div`
 `;
 
 // условия авторизации при помощи useForm и yupResolver
-const AuthorizationContainer = ({ className }) => {
+const RegistrationContainer = ({ className }) => {
 	// функция dispatch
 	const dispatch = useDispatch();
-    // информация о состоянии хранилища
+	// информация о состоянии хранилища
 	const store = useStore();
-    // роль пользователя
+	// роль пользователя
 	const roleId = useSelector(selectUserRole);
 
-   // вызывается функция subscribe() в качестве параметра которой передается функция,
+	// вызывается функция subscribe() в качестве параметра которой передается функция,
 	// которая будет вызываться каждый раз, когда изменится состояние хранилища.
 	useEffect(() => {
 		let currentWasLogout = store.getState().app.wasLogout;
@@ -84,14 +82,15 @@ const AuthorizationContainer = ({ className }) => {
 		defaultValues: {
 			login: '',
 			password: '',
+			passcheck: '',
 		},
-		resolver: yupResolver(authFormSchema),
+		resolver: yupResolver(registerFormSchema),
 	});
 	//  переменная для вывода ошибок сервера
 	const [serverError, setServerError] = useState(null);
 	// обработка ошибки сервера на форме авторизации
 	const onSubmit = ({ login, password }) => {
-		server.authorize(login, password).then(({ error, res }) => {
+		server.register(login, password).then(({ error, res }) => {
 			if (error) {
 				setServerError(`Ошибка запроса:${error}`);
 				return;
@@ -100,7 +99,8 @@ const AuthorizationContainer = ({ className }) => {
 		});
 	};
 	// ошибки формы авторизации
-	const formError = errors?.login?.message || errors?.password?.message; // Исправлено
+	const formError = errors?.login?.message ||
+		errors?.password?.message || errors?.passcheck?.message; // Исправлено
 	// ошибки сервера при авторизации
 	const errorMessage = formError || serverError;
 
@@ -110,7 +110,7 @@ const AuthorizationContainer = ({ className }) => {
 	}
 	return (
 		<div className={className}>
-			<H2>Авторизация</H2>
+			<H2>Регистрация</H2>
 			<form onSubmit={handleSubmit(onSubmit)}>
 				<Input
 					type="text"
@@ -126,15 +126,21 @@ const AuthorizationContainer = ({ className }) => {
 						onChange: () => setServerError(null),
 					})}
 				/>
-				<Button type="submit">Авторизоватся</Button>
+				<Input
+					type="password"
+					placeholder="Проверка пароля..."
+					{...register('passcheck', {
+						onChange: () => setServerError(null),
+					})}
+				/>
+				<Button type="submit">Зарегистрироваться</Button>
 				{errorMessage && <ErrorMessage>{errorMessage}</ErrorMessage>}
-				<StyledLink to="/register">Регистрация</StyledLink>
-			</form>
+				</form>
 		</div>
 	);
 };
 
-const Authorization = styled(AuthorizationContainer)`
+const Registration = styled(RegistrationContainer)`
 	margin-top: 100px;
 	display: flex;
 	align-items: center;
@@ -149,4 +155,4 @@ const Authorization = styled(AuthorizationContainer)`
 	}
 `;
 
-export default Authorization;
+export default Registration;
