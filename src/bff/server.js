@@ -41,10 +41,10 @@ export const server = {
 	// регистрация пользователя
 	async register(regLogin, regPassword) {
 		// запрос на сервер для получения списка пользователей
-		const user = await getUser(regLogin);
+		const existingUser = await getUser(regLogin);
 
 		//проверка вывода пользователя
-		if (user) {
+		if (existingUser) {
 			return {
 				error: 'Такой логин уже зарегистрирован',
 				res: null,
@@ -54,17 +54,19 @@ export const server = {
 		// добавление нового пользователя
 		await addUser(regLogin, regPassword);
 
-		if (!user) {
+		// получаем данные нового пользователя
+		const newUser = await getUser(regLogin);
+		if (!newUser) {
 			return {
-				error:'Ошибка при регистрации',
+				error: 'Ошибка при регистрации',
 				res: null,
-			}
+			};
 		}
 
 		// сессия для пользователя
-		const sessison = {
+		const session = {
 			logout() {
-				Object.keys(sessison).forEach((key) => delete sessison[key]);
+				Object.keys(session).forEach((key) => delete session[key]);
 			},
 			removeComment() {
 				console.log('Удаления комментария');
@@ -74,10 +76,10 @@ export const server = {
 		return {
 			error: null,
 			res: {
-				id: user.id,
-				login: user.login,
-				roleId: user.role_id,
-				session: sessions.create(user),
+				id: newUser.id,
+				login: newUser.login,
+				roleId: newUser.role_id,
+				session: sessions.create(newUser),
 			},
 		};
 	},

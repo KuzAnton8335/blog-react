@@ -1,8 +1,8 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { useDispatch, useStore, useSelector } from 'react-redux';
-import { Link, Navigate } from 'react-router-dom';
+import { useDispatch, useSelector, useStore } from 'react-redux';
+import { Navigate } from 'react-router-dom';
 import styled from 'styled-components';
 import * as yup from 'yup';
 import { setUser } from '../../actions';
@@ -11,12 +11,10 @@ import { Button } from '../../components/Button/Button';
 import { Input } from '../../components/Input/Input';
 import H2 from '../../components/h2/H2';
 import ROLE from '../../constants';
-import {
-	selectUserRole,
-} from '../../selectors';
+import { selectUserRole } from '../../selectors';
 
 //схема авторизации при помощи yup
-const registerFormSchema = yup.object().shape({
+const regFormSchema = yup.object().shape({
 	login: yup
 		.string()
 		.required('Заполните поле логина')
@@ -35,10 +33,9 @@ const registerFormSchema = yup.object().shape({
 		.max(30, 'Неверно заполнено  поля пароля,  Максимум 30 символов'),
 	passcheck: yup
 		.string()
-		.required('Заполните повторно поле пароля')
+		.required('Заполнит повтор пароля')
 		.oneOf([yup.ref('password'), null], 'Пароли не совпадают'),
 });
-
 
 const ErrorMessage = styled.div`
 	margin: 10px 0 0;
@@ -65,12 +62,12 @@ const RegistrationContainer = ({ className }) => {
 			let prevWasLogout = currentWasLogout;
 			currentWasLogout = store.getState().app.wasLogout;
 
-			if(!currentWasLogout !== prevWasLogout) {
+			if (!currentWasLogout !== prevWasLogout) {
 				reset();
 			}
 			return unsubscribe;
-		})
-	},[store])
+		});
+	}, [store]);
 
 	// переменные для работы формы авторизации
 	const {
@@ -84,7 +81,7 @@ const RegistrationContainer = ({ className }) => {
 			password: '',
 			passcheck: '',
 		},
-		resolver: yupResolver(registerFormSchema),
+		resolver: yupResolver(regFormSchema),
 	});
 	//  переменная для вывода ошибок сервера
 	const [serverError, setServerError] = useState(null);
@@ -99,14 +96,14 @@ const RegistrationContainer = ({ className }) => {
 		});
 	};
 	// ошибки формы авторизации
-	const formError = errors?.login?.message ||
-		errors?.password?.message || errors?.passcheck?.message; // Исправлено
+	const formError =
+		errors?.login?.message || errors?.password?.message || errors?.passcheck?.message; // Исправлено
 	// ошибки сервера при авторизации
 	const errorMessage = formError || serverError;
 
 	//переход на главную страницу
-	if(roleId !== ROLE.GUEST) {
-		<Navigate to="/"/>
+	if (roleId !== ROLE.GUEST) {
+		<Navigate to="/" />;
 	}
 	return (
 		<div className={className}>
@@ -135,7 +132,7 @@ const RegistrationContainer = ({ className }) => {
 				/>
 				<Button type="submit">Зарегистрироваться</Button>
 				{errorMessage && <ErrorMessage>{errorMessage}</ErrorMessage>}
-				</form>
+			</form>
 		</div>
 	);
 };

@@ -1,7 +1,7 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { useDispatch, useStore, useSelector } from 'react-redux';
+import { useDispatch, useSelector, useStore } from 'react-redux';
 import { Link, Navigate } from 'react-router-dom';
 import styled from 'styled-components';
 import * as yup from 'yup';
@@ -11,9 +11,7 @@ import { Button } from '../../components/Button/Button';
 import { Input } from '../../components/Input/Input';
 import H2 from '../../components/h2/H2';
 import ROLE from '../../constants';
-import {
-	selectUserRole,
-} from '../../selectors';
+import { selectUserRole } from '../../selectors';
 
 //схема авторизации при помощи yup
 const authFormSchema = yup.object().shape({
@@ -53,12 +51,12 @@ const ErrorMessage = styled.div`
 const AuthorizationContainer = ({ className }) => {
 	// функция dispatch
 	const dispatch = useDispatch();
-    // информация о состоянии хранилища
+	// информация о состоянии хранилища
 	const store = useStore();
-    // роль пользователя
+	// роль пользователя
 	const roleId = useSelector(selectUserRole);
 
-   // вызывается функция subscribe() в качестве параметра которой передается функция,
+	// вызывается функция subscribe() в качестве параметра которой передается функция,
 	// которая будет вызываться каждый раз, когда изменится состояние хранилища.
 	useEffect(() => {
 		let currentWasLogout = store.getState().app.wasLogout;
@@ -67,12 +65,12 @@ const AuthorizationContainer = ({ className }) => {
 			let prevWasLogout = currentWasLogout;
 			currentWasLogout = store.getState().app.wasLogout;
 
-			if(!currentWasLogout !== prevWasLogout) {
+			if (!currentWasLogout !== prevWasLogout) {
 				reset();
 			}
 			return unsubscribe;
-		})
-	},[store])
+		});
+	}, [store]);
 
 	// переменные для работы формы авторизации
 	const {
@@ -105,8 +103,8 @@ const AuthorizationContainer = ({ className }) => {
 	const errorMessage = formError || serverError;
 
 	//переход на главную страницу
-	if(roleId !== ROLE.GUEST) {
-		<Navigate to="/"/>
+	if (roleId !== ROLE.GUEST) {
+		<Navigate to="/" />;
 	}
 	return (
 		<div className={className}>
